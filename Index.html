@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Raksha Bandhan Frame Generator</title>
+
+  <!-- Cropper.js CSS for touch pinch-zoom & dragging -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css"
+  />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+    body { background: #fdf8f2; padding: 15px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
+    .container { max-width: 480px; width: 100%; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h2 { font-size: 20px; text-align: center; color: #8b0000; margin-bottom: 15px; }
+
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; }
+    input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+
+    /* Touch Crop Box */
+    .crop-container { width: 100%; height: 280px; background: #eee; margin-bottom: 15px; display: none; overflow: hidden; border-radius: 6px; }
+    img { max-width: 100%; }
+
+    /* Action Buttons */
+    .btn { width: 100%; background: #8b0000; color: #fff; padding: 12px; border: none; border-radius: 6px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+    .btn-download { background: #28a745; display: none; }
+    .btn-share { background: #25D366; display: none; }
+
+    /* Canvas Output */
+    #finalCanvas { display: none; width: 100%; border-radius: 6px; margin-top: 15px; border: 1px solid #ddd; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Raksha Bandhan Frame Generator</h2>
+
+  <div class="form-group">
+    <label for="docName">Doctor's Name</label>
+    <input type="text" id="docName" placeholder="Dr. Ananya Sharma" />
+  </div>
+
+  <div class="form-group">
+    <label for="siblingName">Sibling's Name</label>
+    <input type="text" id="siblingName" placeholder="Rahul" />
+  </div>
+
+  <div class="form-group">
+    <label for="imageUpload">Upload Photo (Doctor & Sibling)</label>
+    <input type="file" id="imageUpload" accept="image/*" />
+  </div>
+
+  <!-- Touch Cropping Area -->
+  <div class="crop-container" id="cropWrapper">
+    <img id="imageToCrop" src="" alt="Preview" />
+  </div>
+
+  <button class="btn" id="generateBtn" style="display:none;">Generate Frame</button>
+
+  <!-- Output Canvas -->
+  <canvas id="finalCanvas" width="1080" height="1080"></canvas>
+  <button class="btn btn-download" id="downloadBtn">Download Graphic</button>
+  <button class="btn btn-share" id="shareBtn">Share to WhatsApp</button>
+</div>
+
+<!-- Cropper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+  let cropper;
+  let frameLoaded = false;
+
+  const imageUpload = document.getElementById('imageUpload');
+  const imageToCrop = document.getElementById('imageToCrop');
+  const cropWrapper = document.getElementById('cropWrapper');
+  const generateBtn = document.getElementById('generateBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const canvas = document.getElementById('finalCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Direct PNG Image URL
+  const overlayFrame = new Image();
+  overlayFrame.crossOrigin = "anonymous";
+  overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png";
+
+  overlayFrame.onload = () => { frameLoaded = true; };
+
+  // 1. Upload Handler
+  imageUpload.addEventListener('change', (e) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        imageToCrop.src = event.target.result;
+        cropWrapper.style.display = 'block';
+        generateBtn.style.display = 'block';
+
+        if (cropper) { cropper.destroy(); }
+
+        cropper = new Cropper(imageToCrop, {
+          aspectRatio: 1, // 1:1 Square for circular crop
+          viewMode: 1,
+          dragMode: 'move',
+          autoCropArea: 0.9,
+          restore: false,
+          guides: true,
+          center: true,
+        });
+      };
+      reader.readAsDataURL(files[0]);
+    }
+  });
+
+  // 2. Render Logic
+  generateBtn.addEventListener('click', () => {
+    if (!cropper) return;
+
+    if (!frameLoaded && !overlayFrame.complete) {
+      alert("Frame image is loading. Please wait a second and try again.");
+      return;
+    }
+
+    try {
+      const doc = document.getElementById('docName').value || "Dr. Name";
+      const sibling = document.getElementById('siblingName').value || "Sibling";
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const croppedCanvas = cropper.getCroppedCanvas({ width: 320, height: 320 });
+
+      // STEP 1: Draw Frame Graphic
+      ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
+
+      // STEP 2: Draw Circular Photo lower down in the white space
+      // Center: X = 680, Y = 540 (Shifted down from 490), Radius = 135px
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(680, 540, 135, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(croppedCanvas, 545, 405, 270, 270);
+      ctx.restore();
+
+      // Draw Maroon Border around Photo
+      ctx.beginPath();
+      ctx.arc(680, 540, 135, 0, Math.PI * 2);
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = "#8b0000";
+      ctx.stroke();
+
+      // STEP 3: Render Names directly under photo (Shifted down to Y = 710)
+      ctx.fillStyle = "#8b0000";
+      ctx.font = "bold 30px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(`${doc} & ${sibling}`, 680, 710);
+
+      canvas.style.display = 'block';
+      downloadBtn.style.display = 'block';
+      if (navigator.share) { shareBtn.style.display = 'block'; }
+    } catch (err) {
+      alert("An error occurred: " + err.message);
+    }
+  });
+
+  // 3. Download Logic
+  downloadBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'RakshaBandhan_DoctorCard.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // 4. WhatsApp Share Logic
+  shareBtn.addEventListener('click', () => {
+    canvas.toBlob(async (blob) => {
+      const file = new File([blob], 'RakshaBandhan_DoctorCard.png', { type: 'image/png' });
+      try {
+        await navigator.share({
+          title: 'Happy Raksha Bandhan',
+          text: 'Celebrating the bond of protection and care!',
+          files: [file],
+        });
+      } catch (err) {
+        console.log('Sharing failed or cancelled:', err);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
