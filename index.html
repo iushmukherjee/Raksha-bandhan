@@ -83,14 +83,18 @@
   const canvas = document.getElementById('finalCanvas');
   const ctx = canvas.getContext('2d');
 
-  // Direct PNG Image URL
+  // 1. Frame Background Image
   const overlayFrame = new Image();
   overlayFrame.crossOrigin = "anonymous";
   overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png";
-
   overlayFrame.onload = () => { frameLoaded = true; };
 
-  // 1. Upload Handler
+  // 2. Bottom Logo Image
+  const brandLogo = new Image();
+  brandLogo.crossOrigin = "anonymous";
+  brandLogo.src = "https://i.ibb.co/KcBMxFd2/logo.png"; // Raw image endpoint for ImgBB
+
+  // Upload Handler
   imageUpload.addEventListener('change', (e) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -103,7 +107,7 @@
         if (cropper) { cropper.destroy(); }
 
         cropper = new Cropper(imageToCrop, {
-          aspectRatio: 1, // 1:1 Square for circular crop
+          aspectRatio: 1,
           viewMode: 1,
           dragMode: 'move',
           autoCropArea: 0.9,
@@ -116,7 +120,7 @@
     }
   });
 
-  // 2. Render Logic
+  // Render Logic
   generateBtn.addEventListener('click', () => {
     if (!cropper) return;
 
@@ -129,7 +133,6 @@
       let rawDocName = document.getElementById('docName').value.trim() || "Name";
       const sibling = document.getElementById('siblingName').value.trim() || "Sibling";
 
-      // Ensure "Dr." or "Dr" prefix is included before doctor's name
       let doc = rawDocName;
       if (!/^dr\.?\s+/i.test(rawDocName)) {
         doc = `Dr. ${rawDocName}`;
@@ -139,7 +142,7 @@
 
       const croppedCanvas = cropper.getCroppedCanvas({ width: 360, height: 360 });
 
-      // STEP 1: Draw Frame Graphic
+      // STEP 1: Draw Main Frame Graphic
       ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
       // STEP 2: Draw Circular Photo
@@ -155,14 +158,14 @@
       ctx.drawImage(croppedCanvas, centerX - radius, centerY - radius, radius * 2, radius * 2);
       ctx.restore();
 
-      // Draw Maroon Border around Photo
+      // Border around Photo
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.lineWidth = 6;
       ctx.strokeStyle = "#8b0000";
       ctx.stroke();
 
-      // STEP 3: Smart Text Rendering for Names (Auto-fits long names)
+      // STEP 3: Draw Names
       ctx.fillStyle = "#8b0000";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -172,20 +175,35 @@
       let fontSize = 30;
       ctx.font = `bold ${fontSize}px Arial`;
 
-      // Check if text fits on 1 line by dynamically shrinking font size
       while (ctx.measureText(singleLineText).width > maxWidth && fontSize > 18) {
         fontSize -= 2;
         ctx.font = `bold ${fontSize}px Arial`;
       }
 
       if (ctx.measureText(singleLineText).width <= maxWidth) {
-        // Fits on 1 line
         ctx.fillText(singleLineText, centerX, centerY + radius + 35);
       } else {
-        // Very long names: split across 2 lines so full names always appear
         ctx.font = "bold 22px Arial";
         ctx.fillText(`${doc}`, centerX, centerY + radius + 30);
         ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 58);
+      }
+
+      // STEP 4: Draw Bottom Logo
+      if (brandLogo.complete && brandLogo.naturalWidth > 0) {
+        const maxW = 200;
+        const maxH = 80;
+        
+        let logoW = brandLogo.naturalWidth;
+        let logoH = brandLogo.naturalHeight;
+
+        const ratio = Math.min(maxW / logoW, maxH / logoH);
+        logoW *= ratio;
+        logoH *= ratio;
+
+        const logoX = centerX - (logoW / 2);
+        const logoY = 940 - (logoH / 2);
+        
+        ctx.drawImage(brandLogo, logoX, logoY, logoW, logoH);
       }
 
       canvas.style.display = 'block';
@@ -196,7 +214,7 @@
     }
   });
 
-  // 3. Download Logic
+  // Download Logic
   downloadBtn.addEventListener('click', () => {
     const link = document.createElement('a');
     link.download = 'RakshaBandhan_DoctorCard.png';
@@ -204,7 +222,7 @@
     link.click();
   });
 
-  // 4. WhatsApp Share Logic
+  // WhatsApp Share Logic
   shareBtn.addEventListener('click', () => {
     canvas.toBlob(async (blob) => {
       const file = new File([blob], 'RakshaBandhan_DoctorCard.png', { type: 'image/png' });
@@ -223,4 +241,3 @@
 
 </body>
 </html>
-
