@@ -86,7 +86,7 @@
   // 1. Frame Background Image
   const overlayFrame = new Image();
   overlayFrame.crossOrigin = "anonymous";
-  overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png?v=2";
+  overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png?v=3";
   overlayFrame.onload = () => { frameLoaded = true; };
 
   // Upload Handler
@@ -131,9 +131,9 @@
     // STEP 1: Draw Main Frame Graphic
     ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
-    // STEP 2: Draw Circular Photo (Shifted Right to 710)
-    const centerX = 710;
-    const centerY = 510;
+    // STEP 2: Draw Circular Photo (Shifted Right to 740 and Down to 540)
+    const centerX = 740;
+    const centerY = 540;
     const radius = 150;
 
     ctx.save();
@@ -151,7 +151,7 @@
     ctx.strokeStyle = "#8b0000";
     ctx.stroke();
 
-    // STEP 3: Draw Names (Centered relative to new X position)
+    // STEP 3: Draw Names (Centered relative to new X and Y positions)
     ctx.fillStyle = "#8b0000";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
