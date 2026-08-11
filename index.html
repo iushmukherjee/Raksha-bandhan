@@ -83,10 +83,10 @@
   const canvas = document.getElementById('finalCanvas');
   const ctx = canvas.getContext('2d');
 
-  // 1. Frame Background Image
+  // 1. Frame Background Image (Updated to Cream & Gold theme with cache buster)
   const overlayFrame = new Image();
   overlayFrame.crossOrigin = "anonymous";
-  overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png?v=3";
+  overlayFrame.src = "https://i.ibb.co/F4MTh4h4/Cream-and-Gold-Raksha-Bandhan-Greeting-Card.png?v=4";
   overlayFrame.onload = () => { frameLoaded = true; };
 
   // Upload Handler
@@ -131,7 +131,7 @@
     // STEP 1: Draw Main Frame Graphic
     ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
-    // STEP 2: Draw Circular Photo (Shifted Right to 740 and Down to 540)
+    // STEP 2: Draw Circular Photo
     const centerX = 740;
     const centerY = 540;
     const radius = 150;
@@ -151,7 +151,7 @@
     ctx.strokeStyle = "#8b0000";
     ctx.stroke();
 
-    // STEP 3: Draw Names (Centered relative to new X and Y positions)
+    // STEP 3: Draw Names
     ctx.fillStyle = "#8b0000";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
