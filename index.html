@@ -14,7 +14,7 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
     body { background: #fdf8f2; padding: 15px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
-    .container { max-width: 480px; width: 100%; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .container { max-width: 520px; width: 100%; background: #ffffff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     h2 { font-size: 20px; text-align: center; color: #8b0000; margin-bottom: 15px; }
 
     .form-group { margin-bottom: 12px; }
@@ -131,33 +131,39 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const croppedCanvas = cropper.getCroppedCanvas({ width: 320, height: 320 });
+      // Increased crop rendering resolution for larger frame size
+      const croppedCanvas = cropper.getCroppedCanvas({ width: 360, height: 360 });
 
       // STEP 1: Draw Frame Graphic
       ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
-      // STEP 2: Draw Circular Photo lower down in the white space
-      // Center: X = 680, Y = 540 (Shifted down from 490), Radius = 135px
+      // STEP 2: Draw Bigger Circular Photo in middle-right open area
+      // Center: X = 680, Y = 520, Radius = 155px (Bigger diameter: 310px)
+      const centerX = 680;
+      const centerY = 520;
+      const radius = 155;
+
       ctx.save();
       ctx.beginPath();
-      ctx.arc(680, 540, 135, 0, Math.PI * 2, true);
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.clip();
-      ctx.drawImage(croppedCanvas, 545, 405, 270, 270);
+      ctx.drawImage(croppedCanvas, centerX - radius, centerY - radius, radius * 2, radius * 2);
       ctx.restore();
 
       // Draw Maroon Border around Photo
       ctx.beginPath();
-      ctx.arc(680, 540, 135, 0, Math.PI * 2);
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
       ctx.lineWidth = 6;
       ctx.strokeStyle = "#8b0000";
       ctx.stroke();
 
-      // STEP 3: Render Names directly under photo (Shifted down to Y = 710)
+      // STEP 3: Render Names directly under photo with Middle Center Alignment
       ctx.fillStyle = "#8b0000";
-      ctx.font = "bold 30px Arial";
+      ctx.font = "bold 32px Arial";
       ctx.textAlign = "center";
-      ctx.fillText(`${doc} & ${sibling}`, 680, 710);
+      ctx.textBaseline = "middle";
+      ctx.fillText(`${doc} & ${sibling}`, centerX, centerY + radius + 35);
 
       canvas.style.display = 'block';
       downloadBtn.style.display = 'block';
