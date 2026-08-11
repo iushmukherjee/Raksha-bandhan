@@ -41,7 +41,7 @@
 
   <div class="form-group">
     <label for="docName">Doctor's Name</label>
-    <input type="text" id="docName" placeholder="Dr. Ananya Sharma" />
+    <input type="text" id="docName" placeholder="Ananya Sharma" />
   </div>
 
   <div class="form-group">
@@ -126,22 +126,26 @@
     }
 
     try {
-      const doc = document.getElementById('docName').value || "Dr. Name";
-      const sibling = document.getElementById('siblingName').value || "Sibling";
+      let rawDocName = document.getElementById('docName').value.trim() || "Name";
+      const sibling = document.getElementById('siblingName').value.trim() || "Sibling";
+
+      // Ensure "Dr." or "Dr" prefix is included before doctor's name
+      let doc = rawDocName;
+      if (!/^dr\.?\s+/i.test(rawDocName)) {
+        doc = `Dr. ${rawDocName}`;
+      }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Increased crop rendering resolution for larger frame size
       const croppedCanvas = cropper.getCroppedCanvas({ width: 360, height: 360 });
 
       // STEP 1: Draw Frame Graphic
       ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
-      // STEP 2: Draw Bigger Circular Photo in middle-right open area
-      // Center: X = 680, Y = 520, Radius = 155px (Bigger diameter: 310px)
+      // STEP 2: Draw Circular Photo
       const centerX = 680;
-      const centerY = 520;
-      const radius = 155;
+      const centerY = 510;
+      const radius = 150;
 
       ctx.save();
       ctx.beginPath();
@@ -158,12 +162,31 @@
       ctx.strokeStyle = "#8b0000";
       ctx.stroke();
 
-      // STEP 3: Render Names directly under photo with Middle Center Alignment
+      // STEP 3: Smart Text Rendering for Names (Auto-fits long names)
       ctx.fillStyle = "#8b0000";
-      ctx.font = "bold 32px Arial";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(`${doc} & ${sibling}`, centerX, centerY + radius + 35);
+
+      const maxWidth = 380;
+      const singleLineText = `${doc} & ${sibling}`;
+      let fontSize = 30;
+      ctx.font = `bold ${fontSize}px Arial`;
+
+      // Check if text fits on 1 line by dynamically shrinking font size
+      while (ctx.measureText(singleLineText).width > maxWidth && fontSize > 18) {
+        fontSize -= 2;
+        ctx.font = `bold ${fontSize}px Arial`;
+      }
+
+      if (ctx.measureText(singleLineText).width <= maxWidth) {
+        // Fits on 1 line
+        ctx.fillText(singleLineText, centerX, centerY + radius + 35);
+      } else {
+        // Very long names: split across 2 lines so full names always appear
+        ctx.font = "bold 22px Arial";
+        ctx.fillText(`${doc}`, centerX, centerY + radius + 30);
+        ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 58);
+      }
 
       canvas.style.display = 'block';
       downloadBtn.style.display = 'block';
@@ -200,3 +223,4 @@
 
 </body>
 </html>
+
