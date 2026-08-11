@@ -89,10 +89,10 @@
   overlayFrame.src = "https://i.ibb.co/twZjPdGV/rakhi-frame.png";
   overlayFrame.onload = () => { frameLoaded = true; };
 
-  // 2. Bottom Logo Image
+  // 2. Direct Bottom Logo Image
   const brandLogo = new Image();
   brandLogo.crossOrigin = "anonymous";
-  brandLogo.src = "https://i.ibb.co/KcBMxFd2/logo.png"; // Raw image endpoint for ImgBB
+  brandLogo.src = "https://i.ibb.co/ymKwFWt6/Untitled-2-1.png";
 
   // Upload Handler
   imageUpload.addEventListener('change', (e) => {
@@ -190,8 +190,8 @@
 
       // STEP 4: Draw Bottom Logo
       if (brandLogo.complete && brandLogo.naturalWidth > 0) {
-        const maxW = 200;
-        const maxH = 80;
+        const maxW = 240;
+        const maxH = 90;
         
         let logoW = brandLogo.naturalWidth;
         let logoH = brandLogo.naturalHeight;
@@ -201,7 +201,7 @@
         logoH *= ratio;
 
         const logoX = centerX - (logoW / 2);
-        const logoY = 940 - (logoH / 2);
+        const logoY = 930 - (logoH / 2);
         
         ctx.drawImage(brandLogo, logoX, logoY, logoW, logoH);
       }
