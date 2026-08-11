@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -181,10 +182,11 @@
       ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 58);
     }
 
-    // STEP 4: Draw Bottom Logo
+    // STEP 4: Draw Bottom-Right Logo
     if (brandLogo.naturalWidth > 0) {
-      const maxW = 320;
-      const maxH = 65;
+      // Increased dimensions so full graphic shows
+      const maxW = 350;
+      const maxH = 120;
       
       let logoW = brandLogo.naturalWidth;
       let logoH = brandLogo.naturalHeight;
@@ -193,8 +195,9 @@
       logoW *= ratio;
       logoH *= ratio;
 
-      const logoX = centerX - (logoW / 2);
-      const logoY = 995 - (logoH / 2);
+      // Positioned in bottom-right corner with 40px padding
+      const logoX = 1040 - logoW;
+      const logoY = 1040 - logoH;
       
       ctx.drawImage(brandLogo, logoX, logoY, logoW, logoH);
     }
