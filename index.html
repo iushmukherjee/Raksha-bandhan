@@ -188,10 +188,10 @@
         ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 58);
       }
 
-      // STEP 4: Draw Bottom Logo
+      // STEP 4: Draw Bottom Logo (Placed cleanly below paragraph text)
       if (brandLogo.complete && brandLogo.naturalWidth > 0) {
-        const maxW = 240;
-        const maxH = 90;
+        const maxW = 320;
+        const maxH = 65;
         
         let logoW = brandLogo.naturalWidth;
         let logoH = brandLogo.naturalHeight;
@@ -201,7 +201,7 @@
         logoH *= ratio;
 
         const logoX = centerX - (logoW / 2);
-        const logoY = 930 - (logoH / 2);
+        const logoY = 995 - (logoH / 2); // Shifted down into the empty bottom margin
         
         ctx.drawImage(brandLogo, logoX, logoY, logoW, logoH);
       }
