@@ -83,10 +83,10 @@
   const canvas = document.getElementById('finalCanvas');
   const ctx = canvas.getContext('2d');
 
-  // 1. Frame Background Image (Updated to Cream & Gold theme with cache buster)
+  // 1. Frame Background Image
   const overlayFrame = new Image();
   overlayFrame.crossOrigin = "anonymous";
-  overlayFrame.src = "https://i.ibb.co/F4MTh4h4/Cream-and-Gold-Raksha-Bandhan-Greeting-Card.png?v=4";
+  overlayFrame.src = "https://i.ibb.co/F4MTh4h4/Cream-and-Gold-Raksha-Bandhan-Greeting-Card.png?v=5";
   overlayFrame.onload = () => { frameLoaded = true; };
 
   // Upload Handler
@@ -126,15 +126,15 @@
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const croppedCanvas = cropper.getCroppedCanvas({ width: 360, height: 360 });
+    const croppedCanvas = cropper.getCroppedCanvas({ width: 420, height: 420 });
 
     // STEP 1: Draw Main Frame Graphic
     ctx.drawImage(overlayFrame, 0, 0, 1080, 1080);
 
-    // STEP 2: Draw Circular Photo
+    // STEP 2: Draw Circular Photo (Bigger radius: 175)
     const centerX = 740;
-    const centerY = 540;
-    const radius = 150;
+    const centerY = 530;
+    const radius = 175;
 
     ctx.save();
     ctx.beginPath();
@@ -151,14 +151,14 @@
     ctx.strokeStyle = "#8b0000";
     ctx.stroke();
 
-    // STEP 3: Draw Names
+    // STEP 3: Draw Names (Lowered slightly under the larger photo)
     ctx.fillStyle = "#8b0000";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    const maxWidth = 380;
+    const maxWidth = 420;
     const singleLineText = `${doc} & ${sibling}`;
-    let fontSize = 30;
+    let fontSize = 32;
     ctx.font = `bold ${fontSize}px Arial`;
 
     while (ctx.measureText(singleLineText).width > maxWidth && fontSize > 18) {
@@ -167,11 +167,11 @@
     }
 
     if (ctx.measureText(singleLineText).width <= maxWidth) {
-      ctx.fillText(singleLineText, centerX, centerY + radius + 35);
+      ctx.fillText(singleLineText, centerX, centerY + radius + 45);
     } else {
-      ctx.font = "bold 22px Arial";
-      ctx.fillText(`${doc}`, centerX, centerY + radius + 30);
-      ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 58);
+      ctx.font = "bold 24px Arial";
+      ctx.fillText(`${doc}`, centerX, centerY + radius + 38);
+      ctx.fillText(`& ${sibling}`, centerX, centerY + radius + 70);
     }
 
     canvas.style.display = 'block';
